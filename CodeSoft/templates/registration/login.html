@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(45deg, #333, #222);
+            color: #fff;
+        }
+
+        .custom-input::placeholder {
+            color: rgb(156, 156, 156);
+        }
+
+        .form-control {
+            background-color: #222;
+            color: #ffffff;
+        }
+
+        .btn-primary {
+            background-color: #00b894;
+            border-color: #00b894;
+        }
+
+        .btn-primary:hover {
+            background-color: #00a383;
+            border-color: #00a383;
+        }
+
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            background-color: #1f1f1f;
+            margin-top: 5%;
+        }
+
+        .login-icon {
+            color: #fff;
+            text-align: center;
+            margin-bottom: 15px;
+            max-width: 35%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="login-form">
+                    <h2 class="text-center">Inicio de sesión</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="usuario">Usuario</label>
+                            <input type="text" class="form-control custom-input" id="email" name="username"
+                                placeholder="Nombre de usuario" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Contraseña</label>
+                            <input type="password" class="form-control custom-input" name="password" id="password"
+                                placeholder="Contraseña" required>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>
