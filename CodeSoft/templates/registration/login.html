@@ -1,86 +1,64 @@
+{% load static %}
 <!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <style>
-        body {
-            background: linear-gradient(45deg, #333, #222);
-            color: #fff;
-        }
-
-        .custom-input::placeholder {
-            color: rgb(156, 156, 156);
-        }
-
-        .form-control {
-            background-color: #222;
-            color: #ffffff;
-        }
-
-        .btn-primary {
-            background-color: #00b894;
-            border-color: #00b894;
-        }
-
-        .btn-primary:hover {
-            background-color: #00a383;
-            border-color: #00a383;
-        }
-
-        .login-form {
-            max-width: 400px;
-            margin: 0 auto;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            background-color: #1f1f1f;
-            margin-top: 5%;
-        }
-
-        .login-icon {
-            color: #fff;
-            text-align: center;
-            margin-bottom: 15px;
-            max-width: 35%;
-        }
-    </style>
-</head>
-
-<body>
+    <link rel="stylesheet" type="text/css" href="{% static 'styles/login.css' %}" />
+    <script
+      src="https://kit.fontawesome.com/64d58efce2.js"
+      crossorigin="anonymous"
+    ></script>
+  
+  </head>
+  <body>
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="login-form">
-                    <h2 class="text-center">Inicio de sesión</h2>
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="usuario">Usuario</label>
-                            <input type="text" class="form-control custom-input" id="email" name="username"
-                                placeholder="Nombre de usuario" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Contraseña</label>
-                            <input type="password" class="form-control custom-input" name="password" id="password"
-                                placeholder="Contraseña" required>
-                        </div>
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-block">Iniciar Sesión</button>
-                        </div>
-                    </form>
-                </div>
+      <div class="forms-container">
+        <div class="signin-signup">
+          <form class="sign-in-form" method="post">
+            {% csrf_token %}
+            <h2 class="title">Iniciar Sesión</h2>
+            <div class="input-field">
+              <i class="fas fa-user"></i>
+              <input type="text" placeholder="Username" name="username" required/>
             </div>
+            <div class="input-field">
+              <i class="fas fa-lock"></i>
+              <input type="password" placeholder="Password" name=password required/>
+            </div>
+            <input type="submit" value="Login" class="btn solid" />
+
+          <!-- <p class="social-text">Or Sign in with social platforms</p>
+            <div class="social-media">
+              <a href="#" class="social-icon">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-google"></i>
+              </a>
+              <a href="#" class="social-icon">
+                <i class="fab fa-linkedin-in"></i>
+              </a> -->
+            </div>
+          </form>
         </div>
+      </div>
+      <div class="panels-container">
+
+        <div class="panel left-panel">
+            <div class="content">
+                <h3>CodeSoft</h3>
+                <p>Sirviendo como empresa desde el año 500 a.C</p>
+            </div>
+            <img src="{% static 'img/log.svg' %}" class="image" alt="">
+        </div>
+      </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-</body>
-
+    <script src="{% static 'js/app.js' %}"></script>
+  </body>
 </html>
