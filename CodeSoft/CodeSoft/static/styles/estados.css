@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap');
 
 body {
@@ -18,12 +19,12 @@ body {
   text-align: center;
   display: flex;
   flex-direction: column;
-  font-family: "Poppins", sans-serif; /* Aplica la fuente Poppins */
+  font-family: "Poppins", sans-serif;
   font-weight: bold;
 }
 
 .sidebar h2 {
-  margin: 0;
+  margin: 0px;
   font-size: 24px;
 }
 
@@ -38,7 +39,7 @@ body {
 }
 
 .sidebar a:hover {
-  color: #3a3a3a;;
+  color: #3a3a3a;
   background-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -55,6 +56,27 @@ body {
 .content {
   margin-left: 300px;
   padding: 20px;
+  align-items: center;
 }
 
-  
+.content h2{
+  font-size: 40px;
+  margin-bottom: 30px;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold; 
+}
+
+.btn-grande {
+  padding: 30px 60px; 
+  font-size: 25px; 
+  border-radius: 10px;
+  font-family: "Poppins", sans-serif;
+  font-weight: bold; 
+}
+
+.btn-grande:hover {
+  color: #ffffff;
+  background-color: rgb(58, 58, 58);
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+}

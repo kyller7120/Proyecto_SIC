@@ -1,5 +1,3 @@
-/* Estilos CSS completos en español */
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap');
 
 body {
@@ -61,23 +59,9 @@ body {
 }
 
 .content h2{
-  font-size: 40px;
+  font-size: 50px;
   margin-bottom: 100px;
   font-family: "Poppins", sans-serif;
   font-weight: bold; 
 }
 
-.btn-grande {
-  padding: 40px 90px; 
-  font-size: 25px; 
-  border-radius: 10px;
-  font-family: "Poppins", sans-serif;
-  font-weight: bold; 
-}
-
-.btn-grande:hover {
-  color: #ffffff;
-  background-color: rgb(58, 58, 58);
-  font-family: "Poppins", sans-serif;
-  font-weight: bold;
-}

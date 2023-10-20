@@ -1,28 +1,24 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo de Cuentas</title>
+  <title>Balance General</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="{% static 'styles/catalogo.css' %}">
+  <link rel="stylesheet" href="{% static 'styles/general.css' %}">
 </head>
 <body>
   <div class="sidebar">
     <div class="py-4 text-center logo">
       <a href="/"><img src="{% static 'img/home.png' %}" alt="home"></a>
     </div>
-    <a href="/catalogo_cuentas" class="aclass">Catálogo de Cuentas</a>
-    <a href="/transacciones" class="aclass">Transacciones</a>
-    <a href="/control_costos" class="aclass">Control de Costos</a>
-    <a href="/estados_financieros" class="aclass" >Estados Financieros</a>
+    <a onclick="history.back()" class="aclass">Regresar</a>
     <a href="logout" class="logout-link">Cerrar sesión</a>
   </div>
 
-  <div class="content">
-    <h2>Catálogo de cuentas</h2>
-    <p>Lorem ipsum</p>
+  <div class="content d-flex justify-content-center align-items-center flex-column">
+    <h2>Balance General</h2>
   </div>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

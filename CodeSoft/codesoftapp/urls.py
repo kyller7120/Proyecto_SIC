@@ -3,16 +3,29 @@ from django.contrib.auth.decorators import login_required
 from . import views
 urlpatterns = [
     ##login
-    path('', login_required(views.inicio)),
-    path('login', login_required(views.inicio)),
+    path('', views.inicio),
+    path('login', views.inicio),
     path('logout', views.logout_view),
 
     ##catalogo de cuentas
-    path('catalogo_cuentas', login_required(views.catalogo)),
+    path('catalogo_cuentas', views.catalogo),
+
     ##control de costos
-    path('control_costos', login_required(views.control)),
+    path('control_costos', views.control),
+    path('costos_indirectos_fabricacion', views.indirectos),
+    path('mano_de_obra_directa', views.manoobra),
+
     ##estados financieros
-    path('estados_financieros', login_required(views.estados)),
+    path('estados_financieros', views.estados),
+
+    path('balance_comprobacion', views.comprobacion),
+    path('ajustes', views.ajustes),
+    path('balance_ajustado', views.ajustado),
+    path('estado_resultados', views.resultados),
+    path('estado_capital', views.capital),
+    path('balance_general', views.general),
+
     ##transacciones
-    path('transacciones', login_required(views.transacciones)),
+    path('transacciones', views.transacciones),
+    
 ]
