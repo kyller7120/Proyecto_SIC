@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'codesoftapp',
 ]
 
 MIDDLEWARE = [
@@ -81,12 +82,13 @@ DATABASES = {
 }
 
 #DATABASES = {
- #   'default': {
-  #     'ENGINE': 'django.db.backends.mysql',
-   #    'USER':'root',
-    #    'PASSWORD':'HDP115',
-     #  'PORT':'3306',
-    #}
+     #'default': {
+       #'ENGINE': 'django.db.backends.postgresql',
+      # 'USER':'root',
+     #  'HOST':'localhost',
+    #   'NAME':'sic',
+   #     'PORT':'3306',
+ #   }
 #}
 
 

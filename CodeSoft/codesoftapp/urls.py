@@ -1,9 +1,8 @@
 from django.urls import path
-from django.contrib.auth.decorators import login_required
 from . import views
 urlpatterns = [
     ##login
-    path('', views.inicio),
+    path('', views.inicio, name='inicio'),
     path('login', views.inicio),
     path('logout', views.logout_view),
 
@@ -28,4 +27,6 @@ urlpatterns = [
     ##transacciones
     path('transacciones', views.transacciones),
     
+    path('agregar_cuenta', views.agregar_cuenta, name='agregar_cuenta'),
+    path('agregar_transaccion', views.agregar_transaccion, name='agregar_transaccion'),
 ]

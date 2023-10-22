@@ -56,3 +56,8 @@ body {
   margin-left: 300px;
   padding: 20px;
 }
+
+h2 {
+  font-family: "Poppins", sans-serif; /* Aplica la fuente Poppins */
+  font-weight: bold;
+}

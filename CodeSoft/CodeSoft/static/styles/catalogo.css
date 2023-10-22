@@ -4,7 +4,10 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
 }
-
+h2 {
+  font-family: "Poppins", sans-serif;
+  font-weight: bold; 
+}
 .sidebar {
   height: 100%;
   width: 300px;
