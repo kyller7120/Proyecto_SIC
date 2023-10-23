@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.http import JsonResponse
 from .models import Cuenta, Transaccion
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
+from django.db.models import Sum
 
 #inicio
 @login_required
@@ -19,6 +20,7 @@ def logout_view(request):
 @login_required
 def catalogo(request):
     cuentas = Cuenta.objects.all()
+    cuentas = cuentas.order_by('codigo')
     return render(request, 'catalogo/catalogo.html', {'cuentas': cuentas})
 
 #control de costos
@@ -63,7 +65,9 @@ def transacciones(request):
     transacciones = transacciones.order_by('fecha')
     cuentas = Cuenta.objects.all()
     cuentas = cuentas.order_by('codigo')
-    return render(request, 'transacciones/transacciones.html', {'transacciones': transacciones, 'cuentas': cuentas})
+    suma_debe = Transaccion.objects.aggregate(Sum('movimiento_debe'))['movimiento_debe__sum']
+    suma_haber = Transaccion.objects.aggregate(Sum('movimiento_haber'))['movimiento_haber__sum']
+    return render(request, 'transacciones/transacciones.html', {'transacciones': transacciones, 'cuentas': cuentas, 'suma_debe': suma_debe, 'suma_haber': suma_haber})
 
 @login_required
 def agregar_cuenta(request):
@@ -90,14 +94,10 @@ def agregar_transaccion(request):
         codigo = request.POST.get('codigo')
         fecha = request.POST.get('fecha')
         descripcion = request.POST.get('descripcion')
-        movimiento_debe = request.POST.get('movimiento_debe')
-        movimiento_haber = request.POST.get('movimiento_haber')
-        saldo_deudor = request.POST.get('saldo_deudor')
-        saldo_acreedor = request.POST.get('saldo_acreedor')
-
+        movimiento_debe = request.POST.get('movimiento_debe', 0)  # Si está vacío, asigna 0
+        movimiento_haber = request.POST.get('movimiento_haber', 0)  # Si está vacío, asigna 0
         # Busca la instancia de Cuenta con el código proporcionado
         cuenta = Cuenta.objects.get(codigo=codigo)
-
         # Crea una nueva instancia de Transaccion
         nueva_transaccion = Transaccion(
             codigo=cuenta,  # Asigna la instancia de Cuenta
@@ -105,10 +105,54 @@ def agregar_transaccion(request):
             descripcion=descripcion,
             movimiento_debe=movimiento_debe,
             movimiento_haber=movimiento_haber,
-            saldo_deudor=saldo_deudor,
-            saldo_acreedor=saldo_acreedor
         )
         nueva_transaccion.save()
         cuentas = Cuenta.objects.all()
         cuentas = cuentas.order_by('codigo')
-    return render(request, 'transacciones/transacciones.html', {'transacciones': transacciones, 'cuentas': cuentas})
+        
+    # Calcular la suma total del movimiento_debe y movimiento_haber
+    suma_debe = Transaccion.objects.aggregate(Sum('movimiento_debe'))['movimiento_debe__sum']
+    suma_haber = Transaccion.objects.aggregate(Sum('movimiento_haber'))['movimiento_haber__sum']
+
+    return render(request, 'transacciones/transacciones.html', {'transacciones': transacciones, 'cuentas': cuentas, 'suma_debe': suma_debe, 'suma_haber': suma_haber})
+
+# Otras vistas existentes...
+
+@login_required
+def modificar_transaccion(request, transaccion_id):
+    # Obtén la transacción que se va a editar
+    transaccion = get_object_or_404(Transaccion, pk=transaccion_id)
+
+    if request.method == 'POST':
+        if 'fecha' in request.POST:
+            transaccion.fecha = request.POST['fecha']
+        if 'descripcion' in request.POST:
+            transaccion.descripcion = request.POST['descripcion']
+        if 'movimiento_debe' in request.POST:
+            transaccion.movimiento_debe = request.POST['movimiento_debe']
+        else:
+            transaccion.movimiento_debe = 0
+        if 'movimiento_haber' in request.POST:
+            transaccion.movimiento_haber = request.POST['movimiento_haber']
+        else:
+            transaccion.movimiento_haber = 0
+        transaccion.save()
+    transacciones = Transaccion.objects.all().order_by('fecha')
+    suma_debe = Transaccion.objects.aggregate(Sum('movimiento_debe'))['movimiento_debe__sum']
+    suma_haber = Transaccion.objects.aggregate(Sum('movimiento_haber'))['movimiento_haber__sum']
+
+    cuentas = Cuenta.objects.all().order_by('codigo')
+    return render(request, 'transacciones/transacciones.html', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})
+
+@login_required
+def eliminar_transaccion(request, transaccion_id):
+    transaccion = Transaccion.objects.get(id=transaccion_id)
+    transaccion.delete()
+    transacciones = Transaccion.objects.all()
+    transacciones = transacciones.order_by('fecha')
+    # Calcular la suma total del movimiento_debe y movimiento_haber
+    suma_debe = Transaccion.objects.aggregate(Sum('movimiento_debe'))['movimiento_debe__sum']
+    suma_haber = Transaccion.objects.aggregate(Sum('movimiento_haber'))['movimiento_haber__sum']
+    cuentas = Cuenta.objects.all()
+    cuentas = cuentas.order_by('codigo')
+    return render(request, 'transacciones/transacciones.html', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})

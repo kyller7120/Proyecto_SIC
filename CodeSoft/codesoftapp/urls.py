@@ -29,4 +29,7 @@ urlpatterns = [
     
     path('agregar_cuenta', views.agregar_cuenta, name='agregar_cuenta'),
     path('agregar_transaccion', views.agregar_transaccion, name='agregar_transaccion'),
+
+    path('modificar_transaccion/<int:transaccion_id>/', views.modificar_transaccion, name='modificar_transaccion'),
+    path('eliminar_transaccion/<int:transaccion_id>/', views.eliminar_transaccion, name='eliminar_transaccion'),
 ]
