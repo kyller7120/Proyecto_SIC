@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.http import JsonResponse
-from .models import Cuenta, Transaccion
+from .models import Cuenta, Transaccion, ResumenCuentas
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.db.models import Sum
@@ -142,7 +142,7 @@ def modificar_transaccion(request, transaccion_id):
     suma_haber = Transaccion.objects.aggregate(Sum('movimiento_haber'))['movimiento_haber__sum']
 
     cuentas = Cuenta.objects.all().order_by('codigo')
-    return render(request, 'transacciones/transacciones.html', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})
+    return redirect('/transacciones', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})
 
 @login_required
 def eliminar_transaccion(request, transaccion_id):
@@ -155,4 +155,36 @@ def eliminar_transaccion(request, transaccion_id):
     suma_haber = Transaccion.objects.aggregate(Sum('movimiento_haber'))['movimiento_haber__sum']
     cuentas = Cuenta.objects.all()
     cuentas = cuentas.order_by('codigo')
-    return render(request, 'transacciones/transacciones.html', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})
+    return redirect('/transacciones', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})
+
+@login_required
+def actualizar_resumen_cuentas(request):
+    cuentas = Cuenta.objects.annotate(
+        suma_debe=Sum('transaccion__movimiento_debe'),
+        suma_haber=Sum('transaccion__movimiento_haber')
+    )
+    for cuenta in cuentas:
+        ResumenCuentas.objects.update_or_create(
+            cuenta=cuenta,
+            defaults={
+                'debe_total': cuenta.suma_debe or 0,
+                'haber_total': cuenta.suma_haber or 0,
+            }
+        )
+    suma_debe_total = ResumenCuentas.objects.aggregate(Sum('debe_total'))['debe_total__sum'] or 0
+    suma_haber_total = ResumenCuentas.objects.aggregate(Sum('haber_total'))['haber_total__sum'] or 0
+
+    suma_debe = Transaccion.objects.aggregate(Sum('movimiento_debe'))['movimiento_debe__sum'] or 0
+    suma_haber = Transaccion.objects.aggregate(Sum('movimiento_haber'))['movimiento_haber__sum'] or 0
+
+    cuentas = Cuenta.objects.all().order_by('codigo')
+    transacciones = Transaccion.objects.all().order_by('fecha')
+
+    return render(request, 'transacciones/transacciones.html', {
+        'transacciones': transacciones,
+        'suma_debe': suma_debe,
+        'suma_haber': suma_haber,
+        'cuentas': cuentas,
+        'suma_debe_total': suma_debe_total,
+        'suma_haber_total': suma_haber_total,
+    })

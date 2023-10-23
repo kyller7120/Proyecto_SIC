@@ -34,6 +34,13 @@
         >
           Agregar Transaccion
         </button>
+        <div class="col col-sm-12 mb-3">
+          <div class="btn-group" role="group">
+              <a href="/actualizar_resumen_cuentas" class="btn btn-dark btn-lg">Totalizar</a>
+              <a href="#" class="btn btn-dark btn-lg ml-2">Ver Libro Mayor</a>
+          </div>
+      </div>
+      
         <!-- Botón arriba de la tabla -->
 
         <table class="table table-striped table-dark">
@@ -53,8 +60,8 @@
               <td>{{ transaccion.codigo }}</td>
               <td>{{ transaccion.fecha }}</td>
               <td>{{ transaccion.descripcion }}</td>
-              <td>{{ transaccion.movimiento_debe }}</td>
-              <td>{{ transaccion.movimiento_haber }}</td>
+              <td>${{ transaccion.movimiento_debe }}</td>
+              <td>${{ transaccion.movimiento_haber }}</td>
               <td>
                 <a href="{% url 'modificar_transaccion' transaccion.id %}" class="btn btn-info btn-sm" data-toggle="modal" data-target="#modificarTransaccion{{ transaccion.id }}">Modificar</a>
                 
@@ -113,8 +120,8 @@
             {% endfor %}
             <tr>
               <td colspan="3">Total</td>
-              <td>{{ suma_debe }}</td>
-              <td>{{ suma_haber }}</td>
+              <td>${{ suma_debe }}</td>
+              <td>${{ suma_haber }}</td>
             </tr>
           </tbody>
         </table>
@@ -143,6 +150,7 @@
             >
               <span aria-hidden="true">&times;</span>
             </button>
+            
           </div>
           <div class="modal-body">
             <!-- Formulario para agregar transacciones -->
@@ -153,7 +161,7 @@
                 <select class="form-control" id="codigo" name="codigo" required>
                   {% for cuenta in cuentas %}
                   <option value="{{ cuenta.codigo }}">
-                    {{ cuenta.codigo }}
+                    {{ cuenta.codigo }} - {{ cuenta.nombre}}
                   </option>
                   {% endfor %}
                 </select>

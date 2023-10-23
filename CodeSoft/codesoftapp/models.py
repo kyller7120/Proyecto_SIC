@@ -22,26 +22,9 @@ class Transaccion(models.Model):
         return f"Transacción {self.id} - {self.codigo}"
 
 class ResumenCuentas(models.Model):
+    cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, related_name='resumen_cuentas')
     debe_total = models.DecimalField(max_digits=10, decimal_places=2)
     haber_total = models.DecimalField(max_digits=10, decimal_places=2)
-
-    @classmethod
-    def actualizar_resumen(cls):
-        # Obtener la suma total de movimientos de debe y haber por cuenta
-        resumen = Cuenta.objects.annotate(
-            debe_total=Sum('transaccion__movimiento_debe'),
-            haber_total=Sum('transaccion__movimiento_haber')
-        )
-
-        # Calcular la suma total de movimientos de debe y haber en todas las cuentas
-        suma_debe_total = resumen.aggregate(Sum('debe_total'))['debe_total__sum'] or 0
-        suma_haber_total = resumen.aggregate(Sum('haber_total'))['haber_total__sum'] or 0
-
-        # Crear o actualizar la instancia de ResumenCuentas
-        resumen_cuentas, created = cls.objects.get_or_create(pk=1)
-        resumen_cuentas.debe_total = suma_debe_total
-        resumen_cuentas.haber_total = suma_haber_total
-        resumen_cuentas.save()
 
     def __str__(self):
         return "Resumen de Cuentas"
