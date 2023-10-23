@@ -63,7 +63,7 @@ def capital(request):
 @login_required
 def transacciones(request):
     transacciones = Transaccion.objects.all()
-    transacciones = transacciones.order_by('fecha')
+    transacciones = transacciones.order_by('codigo')
     cuentas = Cuenta.objects.all()
     cuentas = cuentas.order_by('codigo')
     suma_debe = Transaccion.objects.aggregate(Sum('movimiento_debe'))['movimiento_debe__sum']
@@ -158,8 +158,6 @@ def eliminar_transaccion(request, transaccion_id):
     cuentas = cuentas.order_by('codigo')
     return redirect('/transacciones', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})
 
-from django.db.models import F, FloatField, Case, When, Value, Sum, ExpressionWrapper
-
 @login_required
 def actualizar_resumen_cuentas(request):
     cuentas = Cuenta.objects.annotate(
@@ -168,24 +166,29 @@ def actualizar_resumen_cuentas(request):
     )
 
     for cuenta in cuentas:
+        suma_debe = cuenta.suma_debe or 0  # Usa 0 si suma_debe es None
+        suma_haber = cuenta.suma_haber or 0  # Usa 0 si suma_haber es None
+        
         saldo = 0  # Inicializa el saldo en 0
+
         if '1000' <= cuenta.codigo <= '1203':
-            saldo = cuenta.suma_debe - cuenta.suma_haber
+            saldo = suma_debe - suma_haber
         elif '2101' <= cuenta.codigo <= '3102':
-            saldo = cuenta.suma_haber - cuenta.suma_debe
+            saldo = suma_haber - suma_debe
         elif '4101' <= cuenta.codigo <= '4112':
-            saldo = cuenta.suma_debe - cuenta.suma_haber
+            saldo = suma_debe - suma_haber
         elif '510101' <= cuenta.codigo <= '510202':
-            saldo = cuenta.suma_haber - cuenta.suma_debe
+            saldo = suma_haber - suma_debe
 
         ResumenCuentas.objects.update_or_create(
             cuenta=cuenta,
             defaults={
-                'debe_total': cuenta.suma_debe or 0,
-                'haber_total': cuenta.suma_haber or 0,
+                'debe_total': suma_debe,
+                'haber_total': suma_haber,
                 'saldo': saldo,
             }
         )
+
     suma_debe_total = ResumenCuentas.objects.aggregate(Sum('debe_total'))['debe_total__sum'] or 0
     suma_haber_total = ResumenCuentas.objects.aggregate(Sum('haber_total'))['haber_total__sum'] or 0
 
