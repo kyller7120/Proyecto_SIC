@@ -41,7 +41,12 @@ def estados(request):
     return render(request, 'estadosfinancieros/estadosfinancieros.html')
 @login_required
 def comprobacion(request):
-    return render(request, 'estadosfinancieros/comprobacion.html')
+    consulta = Cuenta.objects.filter(resumen_cuentas__isnull=False)
+    consulta = consulta.values('codigo', 'nombre', 'resumen_cuentas__debe_total', 'resumen_cuentas__haber_total', 'resumen_cuentas__saldo')
+    resultados = consulta.all()
+    suma_debe = ResumenCuentas.objects.aggregate(Sum('debe_total'))['debe_total__sum']
+    suma_haber = ResumenCuentas.objects.aggregate(Sum('haber_total'))['haber_total__sum']
+    return render(request, 'estadosfinancieros/comprobacion.html', {'resultados': resultados, 'suma_debe': suma_debe, 'suma_haber': suma_haber})
 @login_required
 def ajustes(request):
     return render(request, 'estadosfinancieros/ajustes.html')
