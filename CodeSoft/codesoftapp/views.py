@@ -6,6 +6,7 @@ from .models import Cuenta, Transaccion, ResumenCuentas
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.db.models import Sum
+from django.db.models import F, ExpressionWrapper, FloatField, Case, When, Value, IntegerField
 
 #inicio
 @login_required
@@ -188,3 +189,22 @@ def actualizar_resumen_cuentas(request):
         'suma_debe_total': suma_debe_total,
         'suma_haber_total': suma_haber_total,
     })
+
+def libro_mayor(request):
+    consulta = Cuenta.objects.filter(resumen_cuentas__isnull=False)
+    consulta = consulta.values('codigo', 'nombre', 'resumen_cuentas__debe_total', 'resumen_cuentas__haber_total')
+    
+    consulta = consulta.annotate(
+        saldo=Case(
+            When(codigo__range=['1000', '1203'], then=F('resumen_cuentas__debe_total') - F('resumen_cuentas__haber_total')),
+            When(codigo__range=['2101', '3102'], then=F('resumen_cuentas__haber_total') - F('resumen_cuentas__debe_total')),
+            When(codigo__range=['4101', '4112'], then=F('resumen_cuentas__debe_total') - F('resumen_cuentas__haber_total')),
+            When(codigo__range=['510101', '510202'], then=F('resumen_cuentas__haber_total') - F('resumen_cuentas__debe_total')),
+            default=Value(0),
+            output_field=FloatField()
+        )
+    )
+    
+    resultados = consulta.all()
+    return render(request, 'transacciones/libromayor.html', {'resultados': resultados})
+

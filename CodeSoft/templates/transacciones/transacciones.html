@@ -37,13 +37,13 @@
         <div class="col col-sm-12 mb-3">
           <div class="btn-group" role="group">
               <a href="/actualizar_resumen_cuentas" class="btn btn-dark btn-lg">Totalizar</a>
-              <a href="#" class="btn btn-dark btn-lg ml-2">Ver Libro Mayor</a>
+              <a href="libro_mayor" class="btn btn-dark btn-lg ml-2">Ver Libro Mayor</a>
           </div>
       </div>
       
         <!-- Botón arriba de la tabla -->
 
-        <table class="table table-striped table-dark">
+        <table class="table table-striped table-dark table-bordered">
           <thead>
             <tr>
               <th>Código</th>
@@ -87,7 +87,7 @@
                         <select class="form-control" id="codigo" name="codigo" required>
                           {% for cuenta in cuentas %}
                           <option value="{{ cuenta.codigo }}" {% if cuenta.codigo == transaccion.codigo.codigo %}selected{% endif %}>
-                            {{ cuenta.codigo }}
+                            {{ cuenta.codigo }} - {{ cuenta.nombre}}
                           </option>
                           {% endfor %}
                         </select>
@@ -117,7 +117,7 @@
                 </div>
               </div>
             </div>           
-            {% endfor %}
+          {% endfor %}
             <tr>
               <td colspan="3">Total</td>
               <td>${{ suma_debe }}</td>
