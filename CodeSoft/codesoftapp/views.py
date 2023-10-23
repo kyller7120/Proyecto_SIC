@@ -158,18 +158,32 @@ def eliminar_transaccion(request, transaccion_id):
     cuentas = cuentas.order_by('codigo')
     return redirect('/transacciones', {'transaccion': transaccion, 'transacciones': transacciones, 'suma_debe': suma_debe, 'suma_haber': suma_haber, 'cuentas': cuentas})
 
+from django.db.models import F, FloatField, Case, When, Value, Sum, ExpressionWrapper
+
 @login_required
 def actualizar_resumen_cuentas(request):
     cuentas = Cuenta.objects.annotate(
         suma_debe=Sum('transaccion__movimiento_debe'),
         suma_haber=Sum('transaccion__movimiento_haber')
     )
+
     for cuenta in cuentas:
+        saldo = 0  # Inicializa el saldo en 0
+        if '1000' <= cuenta.codigo <= '1203':
+            saldo = cuenta.suma_debe - cuenta.suma_haber
+        elif '2101' <= cuenta.codigo <= '3102':
+            saldo = cuenta.suma_haber - cuenta.suma_debe
+        elif '4101' <= cuenta.codigo <= '4112':
+            saldo = cuenta.suma_debe - cuenta.suma_haber
+        elif '510101' <= cuenta.codigo <= '510202':
+            saldo = cuenta.suma_haber - cuenta.suma_debe
+
         ResumenCuentas.objects.update_or_create(
             cuenta=cuenta,
             defaults={
                 'debe_total': cuenta.suma_debe or 0,
                 'haber_total': cuenta.suma_haber or 0,
+                'saldo': saldo,
             }
         )
     suma_debe_total = ResumenCuentas.objects.aggregate(Sum('debe_total'))['debe_total__sum'] or 0
@@ -192,19 +206,7 @@ def actualizar_resumen_cuentas(request):
 
 def libro_mayor(request):
     consulta = Cuenta.objects.filter(resumen_cuentas__isnull=False)
-    consulta = consulta.values('codigo', 'nombre', 'resumen_cuentas__debe_total', 'resumen_cuentas__haber_total')
-    
-    consulta = consulta.annotate(
-        saldo=Case(
-            When(codigo__range=['1000', '1203'], then=F('resumen_cuentas__debe_total') - F('resumen_cuentas__haber_total')),
-            When(codigo__range=['2101', '3102'], then=F('resumen_cuentas__haber_total') - F('resumen_cuentas__debe_total')),
-            When(codigo__range=['4101', '4112'], then=F('resumen_cuentas__debe_total') - F('resumen_cuentas__haber_total')),
-            When(codigo__range=['510101', '510202'], then=F('resumen_cuentas__haber_total') - F('resumen_cuentas__debe_total')),
-            default=Value(0),
-            output_field=FloatField()
-        )
-    )
+    consulta = consulta.values('codigo', 'nombre', 'resumen_cuentas__debe_total', 'resumen_cuentas__haber_total', 'resumen_cuentas__saldo')
     
     resultados = consulta.all()
     return render(request, 'transacciones/libromayor.html', {'resultados': resultados})
-

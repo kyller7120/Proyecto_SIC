@@ -25,6 +25,7 @@ class ResumenCuentas(models.Model):
     cuenta = models.ForeignKey(Cuenta, on_delete=models.CASCADE, related_name='resumen_cuentas')
     debe_total = models.DecimalField(max_digits=10, decimal_places=2)
     haber_total = models.DecimalField(max_digits=10, decimal_places=2)
+    saldo = models.DecimalField(max_digits=10, decimal_places=2)  # Agrega el campo saldo
 
     def __str__(self):
         return "Resumen de Cuentas"
