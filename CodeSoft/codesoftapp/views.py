@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.db.models import Sum
 from django.db.models import F, ExpressionWrapper, FloatField, Case, When, Value, IntegerField
+from decimal import Decimal
 
 #inicio
 @login_required
@@ -219,12 +220,6 @@ def libro_mayor(request):
     
     resultados = consulta.all()
     return render(request, 'transacciones/libromayor.html', {'resultados': resultados})
-
-from decimal import Decimal
-
-from decimal import Decimal
-
-from decimal import Decimal
 
 @login_required
 def comprobacion(request):
