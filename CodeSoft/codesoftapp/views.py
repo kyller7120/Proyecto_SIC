@@ -222,6 +222,10 @@ def libro_mayor(request):
 
 from decimal import Decimal
 
+from decimal import Decimal
+
+from decimal import Decimal
+
 @login_required
 def comprobacion(request):
     consulta = Cuenta.objects.filter(resumen_cuentas__isnull=False)
