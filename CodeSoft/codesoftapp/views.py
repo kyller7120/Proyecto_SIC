@@ -212,9 +212,41 @@ def actualizar_resumen_cuentas(request):
         'suma_haber_total': suma_haber_total,
     })
 
+@login_required
 def libro_mayor(request):
     consulta = Cuenta.objects.filter(resumen_cuentas__isnull=False)
     consulta = consulta.values('codigo', 'nombre', 'resumen_cuentas__debe_total', 'resumen_cuentas__haber_total', 'resumen_cuentas__saldo')
     
     resultados = consulta.all()
     return render(request, 'transacciones/libromayor.html', {'resultados': resultados})
+
+from decimal import Decimal
+
+@login_required
+def comprobacion(request):
+    consulta = Cuenta.objects.filter(resumen_cuentas__isnull=False)
+    consulta = consulta.values('codigo','nombre', 'resumen_cuentas__debe_total', 'resumen_cuentas__haber_total', 'resumen_cuentas__saldo')
+    resultados = []
+    suma_debe_total = Decimal(0)  # Inicializa la suma del debe
+    suma_haber_total = Decimal(0)  # Inicializa la suma del haber
+    
+    for cuenta in consulta:
+        if '1000' <= cuenta['codigo'] <= '1203':
+            cuenta['resumen_cuentas__debe_total'] = cuenta['resumen_cuentas__saldo']
+            cuenta['resumen_cuentas__haber_total'] = 0
+        elif '2101' <= cuenta['codigo'] <= '3102':
+            cuenta['resumen_cuentas__haber_total'] = cuenta['resumen_cuentas__saldo']
+            cuenta['resumen_cuentas__debe_total'] = 0
+        elif '4101' <= cuenta['codigo'] <= '4112':
+            cuenta['resumen_cuentas__debe_total'] = cuenta['resumen_cuentas__saldo']
+            cuenta['resumen_cuentas__haber_total'] = 0
+        elif '510101' <= cuenta['codigo'] <= '510202':
+            cuenta['resumen_cuentas__haber_total'] = cuenta['resumen_cuentas__saldo']
+            cuenta['resumen_cuentas__debe_total'] = 0
+        
+        resultados.append(cuenta)
+        
+        suma_debe_total += cuenta['resumen_cuentas__debe_total']
+        suma_haber_total += cuenta['resumen_cuentas__haber_total']
+    
+    return render(request, 'estadosfinancieros/comprobacion.html', {'resultados': resultados, 'suma_debe': suma_debe_total, 'suma_haber': suma_haber_total})
