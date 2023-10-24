@@ -62,14 +62,14 @@
             {% for cuenta in resultados %}
             <tr>
                 <td>{{ cuenta.nombre }}</td>
-                <td>${{ cuenta.resumen_cuentas__debe_total }}</td>
-                <td>${{ cuenta.resumen_cuentas__haber_total }}</td>
+                <td style="background-color: rgb(124, 211, 255);">${{ cuenta.resumen_cuentas__debe_total }}</td>
+                <td style="background-color: rgb(196, 255, 218);">${{ cuenta.resumen_cuentas__haber_total }}</td>
             </tr>
             {% endfor %}
-            <tr style="background-color: rgb(255, 157, 157);">
-              <td>Total</td>
-              <td>${{ suma_debe_total }}</td>
-              <td>${{ suma_haber_total }}</td>
+            <tr>
+              <td style="background-color: rgb(254, 101, 101);">Total</td>
+              <td style="background-color: rgb(63, 191, 255);">${{ suma_debe_total }}</td>
+              <td style="background-color: rgb(130, 255, 176);">${{ suma_haber_total }}</td>
             </tr>
             
         </tbody>

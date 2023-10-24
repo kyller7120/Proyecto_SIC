@@ -66,9 +66,9 @@
             <tr>
                 <td>{{ cuenta.codigo }}</td>
                 <td>{{ cuenta.nombre }}</td>
-                <td>${{ cuenta.resumen_cuentas__debe_total }}</td>
-                <td>${{ cuenta.resumen_cuentas__haber_total }}</td>
-                <td>${{ cuenta.resumen_cuentas__saldo }}</td>
+                <td style="background-color: rgb(217, 217, 217);">${{ cuenta.resumen_cuentas__debe_total }}</td>
+                <td style="background-color: rgb(255, 225, 225);">${{ cuenta.resumen_cuentas__haber_total }}</td>
+                <td style="background-color: rgb(177, 255, 173);">${{ cuenta.resumen_cuentas__saldo }}</td>
             </tr>
             {% endfor %}
         </tbody>
