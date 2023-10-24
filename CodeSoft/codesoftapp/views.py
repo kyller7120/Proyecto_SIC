@@ -231,6 +231,10 @@ def modificar_transaccion(request, transaccion_id):
     transaccion = get_object_or_404(Transaccion, pk=transaccion_id)
     
     if request.method == 'POST':
+        if 'codigo' in request.POST:
+            codigo_cuenta = request.POST['codigo']
+            cuenta = Cuenta.objects.get(codigo=codigo_cuenta)  # Encuentra la cuenta con el código proporcionado
+            transaccion.codigo = cuenta  # Asigna la cuenta a la transacción
         if 'fecha' in request.POST:
             transaccion.fecha = request.POST['fecha']
         if 'descripcion' in request.POST:
@@ -318,7 +322,7 @@ def libro_mayor(request, periodo_id=None):
         consulta = Cuenta.objects.filter(resumen_cuentas__isnull=False, resumen_cuentas__periodo=periodo_seleccionado)
         consulta = consulta.values('codigo', 'nombre', 'resumen_cuentas__debe_total', 'resumen_cuentas__haber_total', 'resumen_cuentas__saldo')
         resultados = consulta.all()
-        resultados = resultados.order_by('-codigo')
+        resultados = resultados.order_by('codigo')
 
     return render(request, 'transacciones/libromayor.html', {
         'resultados': resultados,
@@ -398,6 +402,8 @@ def filtrar_transacciones(request, periodo_id=None):
                        })
 
 
+from decimal import Decimal
+
 @login_required
 def actualizar_resumen_cuentas(request, periodo_id=None):
     # Lógica para manejar solicitudes POST
@@ -430,8 +436,8 @@ def actualizar_resumen_cuentas(request, periodo_id=None):
             ResumenCuentas.objects.filter(periodo=periodo_seleccionado).delete()
 
             for cuenta in cuentas:
-                suma_debe = cuenta.suma_debe
-                suma_haber = cuenta.suma_haber
+                suma_debe = float(cuenta.suma_debe)
+                suma_haber = float(cuenta.suma_haber)
                 saldo = 0
 
                 if '1000' <= cuenta.codigo <= '1203':
@@ -452,12 +458,12 @@ def actualizar_resumen_cuentas(request, periodo_id=None):
                         'saldo': saldo,
                     }
                 )
-        else:
-            # Si no hay periodo seleccionado, establece los valores por defecto
-            cuentas = cuentas.annotate(
-                suma_debe=Value(0, output_field=DecimalField()),  # Establece output_field como DecimalField
-                suma_haber=Value(0, output_field=DecimalField())  # Establece output_field como DecimalField
-            )
+    else:
+        # Si no hay periodo seleccionado, establece los valores por defecto
+        cuentas = cuentas.annotate(
+            suma_debe=Value(0, output_field=DecimalField()),  # Establece output_field como DecimalField
+            suma_haber=Value(0, output_field=DecimalField())  # Establece output_field como DecimalField
+        )
     # Lógica para manejar solicitudes GET
     periodos = Periodo.objects.all()
     periodo_seleccionado = None
