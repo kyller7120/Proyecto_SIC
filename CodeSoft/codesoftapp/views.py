@@ -155,9 +155,84 @@ def ajustado(request):
 def general(request):
     return render(request, 'estadosfinancieros/general.html')
 
+from decimal import Decimal
+from django.db.models import F, ExpressionWrapper, DecimalField, Sum
+from django.db.models.functions import Coalesce
+
 @login_required
-def resultados(request):
-    return render(request, 'estadosfinancieros/resultados.html')
+def resultados(request, periodo_id=None):
+    if request.method == 'POST':
+        periodo_id = request.POST.get('periodo')
+        
+    periodos = Periodo.objects.all()
+    periodo_seleccionado = None
+    
+    if periodo_id:
+        periodo_seleccionado = get_object_or_404(Periodo, pk=periodo_id)
+
+    consultas = Cuenta.objects.filter(
+        resumen_cuentas__isnull=False,
+        resumen_cuentas__periodo=periodo_seleccionado,
+        codigo__in=['4101', '4103']
+    ).annotate(
+        debe_total=Coalesce(F('resumen_cuentas__debe_total'), 0),
+        haber_total=Coalesce(F('resumen_cuentas__haber_total'), 0)
+    )
+
+    suma_debe_total1 = consultas.filter(codigo='4101').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total1 = consultas.filter(codigo='4101').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total1 < 0:
+        suma_haber_total1 = -1 * suma_debe_total1
+        suma_debe_total1 = Decimal(0)
+
+    if suma_haber_total1 < 0:
+        suma_debe_total1 = -1 * suma_haber_total1
+        suma_haber_total1 = Decimal(0)
+
+    suma_debe_total2 = consultas.filter(codigo='4103').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total2 = consultas.filter(codigo='4103').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total2 < 0:
+        suma_haber_total2 = -1 * suma_debe_total2
+        suma_debe_total2 = Decimal(0)
+
+    if suma_haber_total2 < 0:
+        suma_debe_total2 = -1 * suma_haber_total2
+        suma_haber_total2 = Decimal(0)
+
+    suma_debe = suma_debe_total1 + suma_debe_total2
+    suma_haber = suma_haber_total1 + suma_haber_total2
+
+    utilidades_haber = suma_haber - suma_debe
+    utilidades_debe = 0
+    if utilidades_haber < 0:
+        utilidades_debe = utilidades_haber * -1
+        utilidades_haber = 0
+
+    return render(request, 'estadosfinancieros/resultados.html', {
+        'suma_debe_total1': suma_debe_total1,
+        'suma_haber_total1': suma_haber_total1,
+        'suma_debe_total2': suma_debe_total2,
+        'suma_haber_total2': suma_haber_total2,
+        'suma_debe': suma_debe,
+        'suma_haber': suma_haber,
+        'utilidades_haber': utilidades_haber,
+        'utilidades_debe':utilidades_debe,
+        'periodos': periodos,
+        'periodo_seleccionado': periodo_seleccionado,
+    })
+
 
 @login_required
 def capital(request):

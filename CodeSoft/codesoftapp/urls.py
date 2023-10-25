@@ -20,7 +20,7 @@ urlpatterns = [
     path('balance_comprobacion', views.comprobacion, name='balance_comprobacion'),
     path('ajustes', views.ajustes),
     path('balance_ajustado', views.ajustado),
-    path('estado_resultados', views.resultados),
+    path('estado_resultados', views.resultados, name='estado_resultados'),
     path('estado_capital', views.capital),
     path('balance_general', views.general),
 
