@@ -39,4 +39,5 @@ urlpatterns = [
     path('agregar_empleado', views.agregar_empleado, name='agregar_empleado'),
     path('modificar_empleado/<int:empleado_id>/', views.modificar_empleado, name='modificar_empleado'),
     path('eliminar_empleado/<int:empleado_id>/', views.eliminar_empleado, name='eliminar_empleado'),
+    path('agregar_a_partida_doble', views.agregar_a_partida_doble, name='agregar_a_partida_doble'),
 ]

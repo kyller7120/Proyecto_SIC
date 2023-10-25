@@ -47,7 +47,7 @@ def manoobra(request):
     suma_insaforp = ManoDeObra.objects.aggregate(Sum('insaforp'))['insaforp__sum']
     suma_costo_real = ManoDeObra.objects.aggregate(Sum('costo_real'))['costo_real__sum']
     total = suma_costo_real
-
+    periodos = Periodo.objects.all()
     return render(request, 'controlcostos/manoobra.html', {'registros': registros,
         'suma_pago_diario': suma_pago_diario,
         'suma_septimo_dia': suma_septimo_dia,
@@ -57,7 +57,8 @@ def manoobra(request):
         'suma_iss': suma_iss,
         'suma_afp': suma_afp,
         'suma_insaforp': suma_insaforp,
-        'suma_costo_real': suma_costo_real})
+        'suma_costo_real': suma_costo_real,
+        'periodos':periodos})
 
 # Vistas relacionadas con los estados financieros
 @login_required
@@ -224,7 +225,6 @@ def agregar_transaccion(request, periodo_id=None):
             periodo_seleccionado = get_object_or_404(Periodo, pk=periodo_id)
         if not periodo_seleccionado:
             periodo_seleccionado = None
-
         transacciones = Transaccion.objects.filter(periodo_id=periodo_id)
         cuenta = Cuenta.objects.get(codigo=codigo)
         nueva_transaccion = Transaccion(
@@ -572,6 +572,8 @@ def agregar_empleado(request):
     total = suma_costo_real
 
     registros = ManoDeObra.objects.all()
+    periodos = Periodo.objects.all()
+
 
     return render(request, 'controlcostos/manoobra.html', {
         'registros': registros,
@@ -583,7 +585,8 @@ def agregar_empleado(request):
         'suma_iss': suma_iss,
         'suma_afp': suma_afp,
         'suma_insaforp': suma_insaforp,
-        'suma_costo_real': suma_costo_real
+        'suma_costo_real': suma_costo_real,
+        'periodos':periodos
     })
 
 def modificar_empleado(request, empleado_id):
@@ -633,6 +636,7 @@ def modificar_empleado(request, empleado_id):
         empleado.save()
 
     registros = ManoDeObra.objects.all()
+    periodos = Periodo.objects.all()
 
     return redirect('/mano_de_obra_directa', {
         'registros': registros,
@@ -644,7 +648,8 @@ def modificar_empleado(request, empleado_id):
         'suma_iss': suma_iss,
         'suma_afp': suma_afp,
         'suma_insaforp': suma_insaforp,
-        'suma_costo_real': suma_costo_real
+        'suma_costo_real': suma_costo_real,
+        'periodos':periodos
     })
 
 def eliminar_empleado(request, empleado_id):
@@ -664,6 +669,7 @@ def eliminar_empleado(request, empleado_id):
     total = suma_costo_real
 
     registros = ManoDeObra.objects.all()
+    periodos = Periodo.objects.all()
 
     return redirect('/mano_de_obra_directa', {
         'registros': registros,
@@ -675,6 +681,129 @@ def eliminar_empleado(request, empleado_id):
         'suma_iss': suma_iss,
         'suma_afp': suma_afp,
         'suma_insaforp': suma_insaforp,
-        'suma_costo_real': suma_costo_real
+        'suma_costo_real': suma_costo_real,
+        'periodos':periodos
     })
 
+def agregar_a_partida_doble(request):
+    if request.method == "POST":
+        fecha = request.POST.get('fecha')
+        periodo = request.POST.get('periodo')
+    
+        suma_pago_diario = ManoDeObra.objects.aggregate(Sum('pago_diario'))['pago_diario__sum']
+        suma_septimo_dia = ManoDeObra.objects.aggregate(Sum('septimo_dia'))['septimo_dia__sum']
+        cuenta = Cuenta.objects.get(codigo='4103')
+        descripcion = 'Mano de obra directa'
+        movimiento_debe = suma_septimo_dia
+        movimiento_haber = 0
+        periodo_id = periodo
+        nueva_transaccion = Transaccion(
+            codigo=cuenta,
+            fecha=fecha,
+            descripcion=descripcion,
+            movimiento_debe=movimiento_debe,
+            movimiento_haber=movimiento_haber,
+            periodo_id = periodo_id
+        )
+        nueva_transaccion.save()
+
+        suma_vacaciones = ManoDeObra.objects.aggregate(Sum('vacaciones'))['vacaciones__sum']
+        cuenta = Cuenta.objects.get(codigo='4104')
+        descripcion = 'Mano de obra directa'
+        movimiento_debe = suma_vacaciones
+        movimiento_haber = 0
+        periodo_id = periodo
+        nueva_transaccion = Transaccion(
+            codigo=cuenta,
+            fecha=fecha,
+            descripcion=descripcion,
+            movimiento_debe=movimiento_debe,
+            movimiento_haber=movimiento_haber,
+            periodo_id = periodo_id
+        )
+        nueva_transaccion.save()
+
+        suma_salario_cancelado = ManoDeObra.objects.aggregate(Sum('salario_cancelado'))['salario_cancelado__sum']
+
+        suma_aguinaldo = ManoDeObra.objects.aggregate(Sum('aguinaldo'))['aguinaldo__sum']
+        cuenta = Cuenta.objects.get(codigo='4105')
+        descripcion = 'Mano de obra directa'
+        movimiento_debe = suma_aguinaldo
+        movimiento_haber = 0
+        periodo_id = periodo
+        nueva_transaccion = Transaccion(
+            codigo=cuenta,
+            fecha=fecha,
+            descripcion=descripcion,
+            movimiento_debe=movimiento_debe,
+            movimiento_haber=movimiento_haber,
+            periodo_id = periodo_id
+        )
+        nueva_transaccion.save()
+
+        suma_iss = ManoDeObra.objects.aggregate(Sum('iss'))['iss__sum']
+        cuenta = Cuenta.objects.get(codigo='4106')
+        descripcion = 'Mano de obra directa'
+        movimiento_debe = suma_iss
+        movimiento_haber = 0
+        periodo_id = periodo
+        nueva_transaccion = Transaccion(
+            codigo=cuenta,
+            fecha=fecha,
+            descripcion=descripcion,
+            movimiento_debe=movimiento_debe,
+            movimiento_haber=movimiento_haber,
+            periodo_id = periodo_id
+        )
+        nueva_transaccion.save()
+
+        suma_afp = ManoDeObra.objects.aggregate(Sum('afp'))['afp__sum']
+        cuenta = Cuenta.objects.get(codigo='4107')
+        descripcion = 'Mano de obra directa'
+        movimiento_debe = suma_afp
+        movimiento_haber = 0
+        periodo_id = periodo
+        nueva_transaccion = Transaccion(
+            codigo=cuenta,
+            fecha=fecha,
+            descripcion=descripcion,
+            movimiento_debe=movimiento_debe,
+            movimiento_haber=movimiento_haber,
+            periodo_id = periodo_id
+        )
+        nueva_transaccion.save()
+
+        suma_insaforp = ManoDeObra.objects.aggregate(Sum('insaforp'))['insaforp__sum']
+        cuenta = Cuenta.objects.get(codigo='4108')
+        descripcion = 'Mano de obra directa'
+        movimiento_debe = suma_insaforp
+        movimiento_haber = 0
+        periodo_id = periodo
+        nueva_transaccion = Transaccion(
+            codigo=cuenta,
+            fecha=fecha,
+            descripcion=descripcion,
+            movimiento_debe=movimiento_debe,
+            movimiento_haber=movimiento_haber,
+            periodo_id = periodo_id
+        )
+        nueva_transaccion.save()
+
+        suma_costo_real = ManoDeObra.objects.aggregate(Sum('costo_real'))['costo_real__sum']
+        cuenta = Cuenta.objects.get(codigo='110101')
+        descripcion = 'Mano de obra directa'
+        movimiento_debe = 0
+        movimiento_haber = suma_costo_real
+        periodo_id = periodo
+        nueva_transaccion = Transaccion(
+            codigo=cuenta,
+            fecha=fecha,
+            descripcion=descripcion,
+            movimiento_debe=movimiento_debe,
+            movimiento_haber=movimiento_haber,
+            periodo_id = periodo_id
+        )
+        nueva_transaccion.save()
+
+        total = suma_costo_real
+    return redirect('/mano_de_obra_directa')
