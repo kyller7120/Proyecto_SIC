@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Cuenta, Transaccion, ResumenCuentas, Periodo
+from .models import Cuenta, Transaccion, ResumenCuentas, Periodo, ManoDeObra
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.db.models import Sum, FloatField, Case, When, F, Value, IntegerField, DecimalField
@@ -35,7 +35,29 @@ def indirectos(request):
 
 @login_required
 def manoobra(request):
-    return render(request, 'controlcostos/manoobra.html')
+    registros = ManoDeObra.objects.all()
+    # Recalcula las sumas totales después de eliminar el empleado
+    suma_pago_diario = ManoDeObra.objects.aggregate(Sum('pago_diario'))['pago_diario__sum']
+    suma_septimo_dia = ManoDeObra.objects.aggregate(Sum('septimo_dia'))['septimo_dia__sum']
+    suma_vacaciones = ManoDeObra.objects.aggregate(Sum('vacaciones'))['vacaciones__sum']
+    suma_salario_cancelado = ManoDeObra.objects.aggregate(Sum('salario_cancelado'))['salario_cancelado__sum']
+    suma_aguinaldo = ManoDeObra.objects.aggregate(Sum('aguinaldo'))['aguinaldo__sum']
+    suma_iss = ManoDeObra.objects.aggregate(Sum('iss'))['iss__sum']
+    suma_afp = ManoDeObra.objects.aggregate(Sum('afp'))['afp__sum']
+    suma_insaforp = ManoDeObra.objects.aggregate(Sum('insaforp'))['insaforp__sum']
+    suma_costo_real = ManoDeObra.objects.aggregate(Sum('costo_real'))['costo_real__sum']
+    total = suma_costo_real
+
+    return render(request, 'controlcostos/manoobra.html', {'registros': registros,
+        'suma_pago_diario': suma_pago_diario,
+        'suma_septimo_dia': suma_septimo_dia,
+        'suma_vacaciones': suma_vacaciones,
+        'suma_salario_cancelado': suma_salario_cancelado,
+        'suma_aguinaldo': suma_aguinaldo,
+        'suma_iss': suma_iss,
+        'suma_afp': suma_afp,
+        'suma_insaforp': suma_insaforp,
+        'suma_costo_real': suma_costo_real})
 
 # Vistas relacionadas con los estados financieros
 @login_required
@@ -513,3 +535,146 @@ def actualizar_resumen_cuentas(request, periodo_id=None):
         'suma_debe_total': suma_debe_total,
         'suma_haber_total': suma_haber_total,
     })
+
+
+def agregar_empleado(request):
+    if request.method == "POST":
+        nombre=request.POST.get('nombre')
+        puesto=request.POST.get('puesto')
+        salario=float(request.POST.get('salario'))
+        
+        pago_diario=salario
+        septimo=salario*7
+        vacaciones=((15*salario)+0.3*(15*salario))/52
+        salario_cancelado=septimo + vacaciones
+        aguinaldo=(15*salario)/52
+        ISS=salario_cancelado*0.075
+        AFP=salario_cancelado*0.0875
+        INSAFORP=salario*0.01
+        costo_real=septimo+vacaciones+aguinaldo+ISS+AFP+INSAFORP
+
+        # Cálculos y creación del nuevo empleado
+        nuevo_empleado = ManoDeObra(nombre_empleado=nombre, puesto_trabajo=puesto, pago_diario=pago_diario, septimo_dia=septimo,
+                                    vacaciones=vacaciones, salario_cancelado=salario_cancelado, aguinaldo=aguinaldo,
+                                    iss=ISS, afp=AFP, insaforp=INSAFORP, costo_real=costo_real)
+        nuevo_empleado.save()
+
+    # Recalcula las sumas totales después de agregar el empleado
+    suma_pago_diario = ManoDeObra.objects.aggregate(Sum('pago_diario'))['pago_diario__sum']
+    suma_septimo_dia = ManoDeObra.objects.aggregate(Sum('septimo_dia'))['septimo_dia__sum']
+    suma_vacaciones = ManoDeObra.objects.aggregate(Sum('vacaciones'))['vacaciones__sum']
+    suma_salario_cancelado = ManoDeObra.objects.aggregate(Sum('salario_cancelado'))['salario_cancelado__sum']
+    suma_aguinaldo = ManoDeObra.objects.aggregate(Sum('aguinaldo'))['aguinaldo__sum']
+    suma_iss = ManoDeObra.objects.aggregate(Sum('iss'))['iss__sum']
+    suma_afp = ManoDeObra.objects.aggregate(Sum('afp'))['afp__sum']
+    suma_insaforp = ManoDeObra.objects.aggregate(Sum('insaforp'))['insaforp__sum']
+    suma_costo_real = ManoDeObra.objects.aggregate(Sum('costo_real'))['costo_real__sum']
+    total = suma_costo_real
+
+    registros = ManoDeObra.objects.all()
+
+    return render(request, 'controlcostos/manoobra.html', {
+        'registros': registros,
+        'suma_pago_diario': suma_pago_diario,
+        'suma_septimo_dia': suma_septimo_dia,
+        'suma_vacaciones': suma_vacaciones,
+        'suma_salario_cancelado': suma_salario_cancelado,
+        'suma_aguinaldo': suma_aguinaldo,
+        'suma_iss': suma_iss,
+        'suma_afp': suma_afp,
+        'suma_insaforp': suma_insaforp,
+        'suma_costo_real': suma_costo_real
+    })
+
+def modificar_empleado(request, empleado_id):
+    empleado = get_object_or_404(ManoDeObra, pk=empleado_id)
+
+    if request.method == "POST":
+        # Obtén los datos actualizados de la solicitud POST
+        nombre = request.POST.get('nombre')
+        puesto = request.POST.get('puesto')
+        salario = float(request.POST.get('salario'))
+        # Realiza los cálculos necesarios
+        pago_diario = salario
+        septimo = salario * 7
+        vacaciones = ((15 * salario) + 0.3 * (15 * salario)) / 52
+        salario_cancelado = septimo + vacaciones
+        aguinaldo = (15 * salario) / 52
+        ISS = salario_cancelado * 0.075
+        AFP = salario_cancelado * 0.0875
+        INSAFORP = salario * 0.01
+        costo_real = septimo + vacaciones + aguinaldo + ISS + AFP + INSAFORP
+
+        # Actualiza los campos del empleado con los nuevos valores
+        empleado.nombre_empleado = nombre
+        empleado.puesto_trabajo = puesto
+        empleado.pago_diario = pago_diario
+        empleado.septimo_dia = septimo
+        empleado.vacaciones = vacaciones
+        empleado.salario_cancelado = salario_cancelado
+        empleado.aguinaldo = aguinaldo
+        empleado.iss = ISS
+        empleado.afp = AFP
+        empleado.insaforp = INSAFORP
+        empleado.costo_real = costo_real
+
+        # Recalcula las sumas totales después de modificar el empleado
+        suma_pago_diario = ManoDeObra.objects.aggregate(Sum('pago_diario'))['pago_diario__sum']
+        suma_septimo_dia = ManoDeObra.objects.aggregate(Sum('septimo_dia'))['septimo_dia__sum']
+        suma_vacaciones = ManoDeObra.objects.aggregate(Sum('vacaciones'))['vacaciones__sum']
+        suma_salario_cancelado = ManoDeObra.objects.aggregate(Sum('salario_cancelado'))['salario_cancelado__sum']
+        suma_aguinaldo = ManoDeObra.objects.aggregate(Sum('aguinaldo'))['aguinaldo__sum']
+        suma_iss = ManoDeObra.objects.aggregate(Sum('iss'))['iss__sum']
+        suma_afp = ManoDeObra.objects.aggregate(Sum('afp'))['afp__sum']
+        suma_insaforp = ManoDeObra.objects.aggregate(Sum('insaforp'))['insaforp__sum']
+        suma_costo_real = ManoDeObra.objects.aggregate(Sum('costo_real'))['costo_real__sum']
+        total = suma_costo_real
+
+        empleado.save()
+
+    registros = ManoDeObra.objects.all()
+
+    return redirect('/mano_de_obra_directa', {
+        'registros': registros,
+        'suma_pago_diario': suma_pago_diario,
+        'suma_septimo_dia': suma_septimo_dia,
+        'suma_vacaciones': suma_vacaciones,
+        'suma_salario_cancelado': suma_salario_cancelado,
+        'suma_aguinaldo': suma_aguinaldo,
+        'suma_iss': suma_iss,
+        'suma_afp': suma_afp,
+        'suma_insaforp': suma_insaforp,
+        'suma_costo_real': suma_costo_real
+    })
+
+def eliminar_empleado(request, empleado_id):
+    empleado = get_object_or_404(ManoDeObra, pk=empleado_id)
+    empleado.delete()
+
+    # Recalcula las sumas totales después de eliminar el empleado
+    suma_pago_diario = ManoDeObra.objects.aggregate(Sum('pago_diario'))['pago_diario__sum']
+    suma_septimo_dia = ManoDeObra.objects.aggregate(Sum('septimo_dia'))['septimo_dia__sum']
+    suma_vacaciones = ManoDeObra.objects.aggregate(Sum('vacaciones'))['vacaciones__sum']
+    suma_salario_cancelado = ManoDeObra.objects.aggregate(Sum('salario_cancelado'))['salario_cancelado__sum']
+    suma_aguinaldo = ManoDeObra.objects.aggregate(Sum('aguinaldo'))['aguinaldo__sum']
+    suma_iss = ManoDeObra.objects.aggregate(Sum('iss'))['iss__sum']
+    suma_afp = ManoDeObra.objects.aggregate(Sum('afp'))['afp__sum']
+    suma_insaforp = ManoDeObra.objects.aggregate(Sum('insaforp'))['insaforp__sum']
+    suma_costo_real = ManoDeObra.objects.aggregate(Sum('costo_real'))['costo_real__sum']
+    total = suma_costo_real
+
+    registros = ManoDeObra.objects.all()
+
+    return redirect('/mano_de_obra_directa', {
+        'registros': registros,
+        'suma_pago_diario': suma_pago_diario,
+        'suma_septimo_dia': suma_septimo_dia,
+        'suma_vacaciones': suma_vacaciones,
+        'suma_salario_cancelado': suma_salario_cancelado,
+        'suma_aguinaldo': suma_aguinaldo,
+        'suma_iss': suma_iss,
+        'suma_afp': suma_afp,
+        'suma_insaforp': suma_insaforp,
+        'suma_costo_real': suma_costo_real
+    })
+

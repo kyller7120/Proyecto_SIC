@@ -38,3 +38,19 @@ class ResumenCuentas(models.Model):
 
     def __str__(self):
         return "Resumen de Cuentas"
+
+class ManoDeObra(models.Model):
+    nombre_empleado = models.CharField(max_length=100)
+    puesto_trabajo = models.CharField(max_length=100)
+    pago_diario = models.DecimalField(max_digits=10, decimal_places=2)
+    septimo_dia = models.DecimalField(max_digits=10, decimal_places=2)
+    vacaciones = models.DecimalField(max_digits=10, decimal_places=2)
+    salario_cancelado = models.DecimalField(max_digits=10, decimal_places=2)
+    aguinaldo = models.DecimalField(max_digits=10, decimal_places=2)
+    iss = models.DecimalField(max_digits=10, decimal_places=2)
+    afp = models.DecimalField(max_digits=10, decimal_places=2)
+    insaforp = models.DecimalField(max_digits=10, decimal_places=2)
+    costo_real = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return self.nombre_empleado
