@@ -173,12 +173,13 @@ def resultados(request, periodo_id=None):
     consultas = Cuenta.objects.filter(
         resumen_cuentas__isnull=False,
         resumen_cuentas__periodo=periodo_seleccionado,
-        codigo__in=['4101', '4103']
+        codigo__in=['4101', '4102', '4103', '4104', '4105', '4106', '4107', '4108', '4109', '4110', '4111', '4112', '510101', '510102']
     ).annotate(
         debe_total=Coalesce(F('resumen_cuentas__debe_total'), 0),
         haber_total=Coalesce(F('resumen_cuentas__haber_total'), 0)
     )
 
+    ##4101
     suma_debe_total1 = consultas.filter(codigo='4101').aggregate(
         Sum('debe_total', output_field=DecimalField())
     )['debe_total__sum'] or Decimal(0)
@@ -195,11 +196,12 @@ def resultados(request, periodo_id=None):
         suma_debe_total1 = -1 * suma_haber_total1
         suma_haber_total1 = Decimal(0)
 
-    suma_debe_total2 = consultas.filter(codigo='4103').aggregate(
+    ### 4102
+    suma_debe_total2 = consultas.filter(codigo='4102').aggregate(
         Sum('debe_total', output_field=DecimalField())
     )['debe_total__sum'] or Decimal(0)
 
-    suma_haber_total2 = consultas.filter(codigo='4103').aggregate(
+    suma_haber_total2 = consultas.filter(codigo='4101').aggregate(
         Sum('haber_total', output_field=DecimalField())
     )['haber_total__sum'] or Decimal(0)
 
@@ -211,8 +213,220 @@ def resultados(request, periodo_id=None):
         suma_debe_total2 = -1 * suma_haber_total2
         suma_haber_total2 = Decimal(0)
 
-    suma_debe = suma_debe_total1 + suma_debe_total2
-    suma_haber = suma_haber_total1 + suma_haber_total2
+    ## 4103
+    suma_debe_total3 = consultas.filter(codigo='4103').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total3 = consultas.filter(codigo='4103').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total3 < 0:
+        suma_haber_total3 = -1 * suma_debe_total3
+        suma_debe_total3 = Decimal(0)
+
+    if suma_haber_total3 < 0:
+        suma_debe_total3 = -1 * suma_haber_total3
+        suma_haber_total3 = Decimal(0)
+
+    ## 4104
+    suma_debe_total4 = consultas.filter(codigo='4104').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total4 = consultas.filter(codigo='4104').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total4 < 0:
+        suma_haber_total4 = -1 * suma_debe_total4
+        suma_debe_total4 = Decimal(0)
+
+    if suma_haber_total4 < 0:
+        suma_debe_total4 = -1 * suma_haber_total4
+        suma_haber_total4 = Decimal(0)
+
+    ## 4105
+    suma_debe_total5 = consultas.filter(codigo='4105').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total5 = consultas.filter(codigo='4105').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total5 < 0:
+        suma_haber_total5 = -1 * suma_debe_total5
+        suma_debe_total5 = Decimal(0)
+
+    if suma_haber_total5 < 0:
+        suma_debe_total5 = -1 * suma_haber_total5
+        suma_haber_total5 = Decimal(0)
+
+    ## 4106
+    suma_debe_total6 = consultas.filter(codigo='4106').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total6 = consultas.filter(codigo='4106').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total6 < 0:
+        suma_haber_total6 = -1 * suma_debe_total6
+        suma_debe_total6 = Decimal(0)
+
+    if suma_haber_total6 < 0:
+        suma_debe_total6 = -1 * suma_haber_total6
+        suma_haber_total6 = Decimal(0)
+
+    ## 4107
+    suma_debe_total7 = consultas.filter(codigo='4107').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total7 = consultas.filter(codigo='4107').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total7 < 0:
+        suma_haber_total7 = -1 * suma_debe_total7
+        suma_debe_total7 = Decimal(0)
+
+    if suma_haber_total7 < 0:
+        suma_debe_total7 = -1 * suma_haber_total7
+        suma_haber_total7 = Decimal(0)
+
+    ## 4108
+    suma_debe_total8 = consultas.filter(codigo='4108').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total8 = consultas.filter(codigo='4108').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total8 < 0:
+        suma_haber_total8 = -1 * suma_debe_total8
+        suma_debe_total8 = Decimal(0)
+
+    if suma_haber_total8 < 0:
+        suma_debe_total8 = -1 * suma_haber_total8
+        suma_haber_total8 = Decimal(0)
+    
+    ## 4109
+    suma_debe_total9 = consultas.filter(codigo='4109').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total9 = consultas.filter(codigo='4109').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total9 < 0:
+        suma_haber_total9 = -1 * suma_debe_total9
+        suma_debe_total9 = Decimal(0)
+
+    if suma_haber_total9 < 0:
+        suma_debe_total9 = -1 * suma_haber_total9
+        suma_haber_total9 = Decimal(0)
+
+    ## 4110
+    suma_debe_total10 = consultas.filter(codigo='4110').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total10 = consultas.filter(codigo='4110').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total10 < 0:
+        suma_haber_total10 = -1 * suma_debe_total10
+        suma_debe_total10 = Decimal(0)
+
+    if suma_haber_total10 < 0:
+        suma_debe_total10 = -1 * suma_haber_total10
+        suma_haber_total10 = Decimal(0)
+    
+    ## 4111
+    suma_debe_total11 = consultas.filter(codigo='4111').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total11 = consultas.filter(codigo='4111').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total11 < 0:
+        suma_haber_total11 = -1 * suma_debe_total11
+        suma_debe_total11 = Decimal(0)
+
+    if suma_haber_total11 < 0:
+        suma_debe_total11 = -1 * suma_haber_total11
+        suma_haber_total11 = Decimal(0)
+
+    ## 4112
+    suma_debe_total12 = consultas.filter(codigo='4112').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total12 = consultas.filter(codigo='4112').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total12 < 0:
+        suma_haber_total12 = -1 * suma_debe_total12
+        suma_debe_total12 = Decimal(0)
+
+    if suma_haber_total12 < 0:
+        suma_debe_total12 = -1 * suma_haber_total12
+        suma_haber_total12 = Decimal(0)
+
+    ## 510101
+    suma_debe_total13 = consultas.filter(codigo='510101').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total13 = consultas.filter(codigo='510101').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total13 < 0:
+        suma_haber_total13 = -1 * suma_debe_total13
+        suma_debe_total13 = Decimal(0)
+
+    if suma_haber_total13 < 0:
+        suma_debe_total13 = -1 * suma_haber_total13
+        suma_haber_total13 = Decimal(0)
+    
+    ## 510102
+    suma_debe_total14 = consultas.filter(codigo='510102').aggregate(
+        Sum('debe_total', output_field=DecimalField())
+    )['debe_total__sum'] or Decimal(0)
+
+    suma_haber_total14 = consultas.filter(codigo='510102').aggregate(
+        Sum('haber_total', output_field=DecimalField())
+    )['haber_total__sum'] or Decimal(0)
+
+    if suma_debe_total14 < 0:
+        suma_haber_total14 = -1 * suma_debe_total14
+        suma_debe_total14 = Decimal(0)
+
+    if suma_haber_total14 < 0:
+        suma_debe_total14 = -1 * suma_haber_total14
+        suma_haber_total14 = Decimal(0)
+#### lo demas ############
+    suma_debe = (suma_debe_total1 + suma_debe_total2 + suma_debe_total3 + 
+                 suma_debe_total4 + suma_debe_total5 + suma_debe_total6 + 
+                 suma_debe_total7 + suma_debe_total8 + suma_debe_total9 + 
+                 suma_debe_total10 + suma_debe_total11 + suma_debe_total12 + 
+                 suma_debe_total13 + suma_debe_total14)
+    suma_haber = (suma_haber_total1 + suma_haber_total2 + suma_haber_total3 + 
+                  suma_haber_total4 + suma_haber_total5 + suma_haber_total6 +
+                  suma_haber_total7 + suma_haber_total8 + suma_haber_total9 +
+                  suma_haber_total10 + suma_haber_total11 + suma_haber_total12 +
+                  suma_haber_total13 + suma_haber_total14)
 
     utilidades_haber = suma_haber - suma_debe
     utilidades_debe = 0
@@ -225,6 +439,30 @@ def resultados(request, periodo_id=None):
         'suma_haber_total1': suma_haber_total1,
         'suma_debe_total2': suma_debe_total2,
         'suma_haber_total2': suma_haber_total2,
+        'suma_debe_total3': suma_debe_total3,
+        'suma_haber_total3': suma_haber_total3,
+        'suma_debe_total4': suma_debe_total4,
+        'suma_haber_total4': suma_haber_total4,
+        'suma_debe_total5': suma_debe_total5,
+        'suma_haber_total5': suma_haber_total5,
+        'suma_debe_total6': suma_debe_total6,
+        'suma_haber_total6': suma_haber_total6,
+        'suma_debe_total7': suma_debe_total7,
+        'suma_haber_total7': suma_haber_total7,
+        'suma_debe_total8': suma_debe_total8,
+        'suma_haber_total8': suma_haber_total8,
+        'suma_debe_total9': suma_debe_total9,
+        'suma_haber_total9': suma_haber_total9,
+        'suma_debe_total10': suma_debe_total10,
+        'suma_haber_total10': suma_haber_total10,
+        'suma_debe_total11': suma_debe_total11,
+        'suma_haber_total11': suma_haber_total11,
+        'suma_debe_total12': suma_debe_total12,
+        'suma_haber_total12': suma_haber_total12,
+        'suma_debe_total13': suma_debe_total13,
+        'suma_haber_total13': suma_haber_total13,
+        'suma_debe_total14': suma_debe_total14,
+        'suma_haber_total14': suma_haber_total14,
         'suma_debe': suma_debe,
         'suma_haber': suma_haber,
         'utilidades_haber': utilidades_haber,
