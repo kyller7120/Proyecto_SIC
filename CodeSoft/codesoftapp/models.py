@@ -54,3 +54,17 @@ class ManoDeObra(models.Model):
 
     def __str__(self):
         return self.nombre_empleado
+
+class Utilidad(models.Model):
+    periodo = models.ForeignKey(Periodo, on_delete=models.CASCADE)  # Clave foránea al período al que pertenece
+    valor_utilidad = models.DecimalField(max_digits=10, decimal_places=2)  # Campo para el valor de utilidad
+
+    def __str__(self):
+        return f"Utilidad para {self.periodo.nombre}"
+    
+class Capital(models.Model):
+    periodo = models.ForeignKey(Periodo, on_delete=models.CASCADE)  # Clave foránea al período al que pertenece
+    valor_capital = models.DecimalField(max_digits=10, decimal_places=2)  # Campo para el valor de utilidad
+
+    def __str__(self):
+        return f"Capital para {self.periodo.nombre}"
